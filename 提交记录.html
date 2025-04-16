@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>GitHub 提交记录</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>GitHub 提交记录</h1>
+    <table id="commitsTable">
+        <thead>
+            <tr>
+                <th>提交ID</th>
+                <th>提交日期</th>
+                <th>提交者</th>
+                <th>提交信息</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- 提交记录将插入到这里 -->
+        </tbody>
+    </table>
+
+    <script>
+        async function fetchCommits(owner, repo) {
+            const url = `https://api.github.com/repos/${owner}/${repo}/commits`;
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error('网络响应失败');
+            }
+            const data = await response.json();
+            return data;
+        }
+
+        async function displayCommits(owner, repo) {
+            try {
+                const commits = await fetchCommits(owner, repo);
+                const tableBody = document.getElementById('commitsTable').getElementsByTagName('tbody')[0];
+                commits.forEach(commit => {
+                    const row = tableBody.insertRow();
+                    row.insertCell(0).textContent = commit.sha;
+                    row.insertCell(1).textContent = new Date(commit.commit.author.date).toLocaleDateString();
+                    row.insertCell(2).textContent = commit.commit.author.name;
+                    row.insertCell(3).textContent = commit.commit.message;
+                });
+            } catch (error) {
+                console.error('获取提交记录失败：', error);
+            }
+        }
+
+        // 示例调用，替换为您的仓库名称
+        displayCommits('MXQ51', 'legendary-octo-fishstick');
+    </script>
+</body>
+</html>
